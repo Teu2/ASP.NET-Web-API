@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Web_API.Data;
 
 namespace Web_API.Controllers
 {
@@ -28,16 +30,22 @@ namespace Web_API.Controllers
             }
         };
 
+        private readonly DataContext _context;
+        public MangaController(DataContext context)
+        {
+            _context = context;
+        }
+
         [HttpGet] // get method to retrieve data
         public async Task<ActionResult<List<Web_API.Models.Mangas>>> GetBook()
         {
-            return Ok(Mangas_Manhwas);
+            return Ok(await _context.MangasManhwas.ToListAsync());
         }
 
         [HttpGet("{bookId}")] // get method to get data by ID
         public async Task<ActionResult<List<Web_API.Models.Mangas>>> GetBookById(int bookId)
         {
-            var book = Mangas_Manhwas.Find(book => book.Id == bookId);
+            var book = await _context.MangasManhwas.FindAsync(bookId);
             if (book == null) return BadRequest("Book not found.");
 
             return Ok(book);
@@ -46,33 +54,39 @@ namespace Web_API.Controllers
         [HttpPost] // post method to send data
         public async Task<ActionResult<List<Web_API.Models.Mangas>>> AddBook(Web_API.Models.Mangas book)
         {
-            Mangas_Manhwas.Add(book);
-            return Ok(Mangas_Manhwas);
+            _context.MangasManhwas.Add(book);
+            await _context.SaveChangesAsync();
+
+            return Ok(await _context.MangasManhwas.ToListAsync());
         }
 
         [HttpPut]
         public async Task<ActionResult<List<Web_API.Models.Mangas>>> UpdateBook(Web_API.Models.Mangas bookRequest)
         {
-            var book = Mangas_Manhwas.Find(book => book.Id == bookRequest.Id);
-            if(book == null) return BadRequest("Book not found.");
+            var dbBook = await _context.MangasManhwas.FindAsync(bookRequest.Id);
+            if (dbBook == null) return BadRequest("Book not found.");
 
-            book.Title = bookRequest.Title;
-            book.Author = bookRequest.Author;
-            book.Status = bookRequest.Status;
-            book.Rating = bookRequest.Rating;
+            dbBook.Title = bookRequest.Title;
+            dbBook.Author = bookRequest.Author;
+            dbBook.Status = bookRequest.Status;
+            dbBook.Rating = bookRequest.Rating;
 
-            return Ok(Mangas_Manhwas);
+            await _context.SaveChangesAsync();
+
+            return Ok(await _context.MangasManhwas.ToListAsync());
         }
 
         [HttpDelete("{bookId}")]
         public async Task<ActionResult<List<Web_API.Models.Mangas>>> DeleteBook(int bookId)
         {
-            var book = Mangas_Manhwas.Find(book => book.Id == bookId);
-            if (book == null) return BadRequest("Book not found.");
+            var dbBook = await _context.MangasManhwas.FindAsync(bookId);
+            if (dbBook == null) return BadRequest("Book not found.");
 
-            Mangas_Manhwas.Remove(book);
 
-            return Ok(Mangas_Manhwas);
+            _context.MangasManhwas.Remove(dbBook);
+            await _context.SaveChangesAsync();
+
+            return Ok(await _context.MangasManhwas.ToListAsync());
         }
     }
 }
