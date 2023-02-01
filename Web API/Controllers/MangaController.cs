@@ -9,27 +9,6 @@ namespace Web_API.Controllers
     [ApiController]
     public class MangaController : ControllerBase
     {
-        private static List<Web_API.Models.Mangas> Mangas_Manhwas = new ()
-        {
-            new Web_API.Models.Mangas
-            {
-                Id = 10,
-                Author = "Akira Toriyama",
-                Rating = "5/5",
-                Status = "Ongoing",
-                Title = "Dragon Ball Super"
-            },
-
-            new Web_API.Models.Mangas
-            {
-                Id = 12,
-                Author = "Takahashi Yoshiyuki - Kuro Ouji",
-                Rating = "5/5",
-                Status = "Ongoing",
-                Title = "I Was Dismissed From The Hero’S Party Because They Don’T Need My Training Skills, So I Strengthened My [Fief] Which I Got As A Replacement For My Retirement Money."
-            }
-        };
-
         private readonly DataContext _context;
         public MangaController(DataContext context)
         {
